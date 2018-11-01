@@ -13,7 +13,7 @@ const getTemplate = ()=> {
     .then(res => {
       resolve(res.data)
     })
-    .catch(reject)
+    .catch(err => reject(err))
   })
 }
 

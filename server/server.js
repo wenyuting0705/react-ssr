@@ -17,7 +17,7 @@ if (!isDev) {
     res.send(template.replace('<!--app-->', appString))
   })
 }else {
-  const appStatic = require('./util/dev-static')
+  const appStatic = require('./util/dev-static') //eslint-disable-line
   appStatic(app)
 }
 
