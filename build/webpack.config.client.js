@@ -1,52 +1,41 @@
 const path = require('path')
 const webpack = require('webpack')
+const webpackMerge = require('webpack-merge')
+const baseConfig = require('./webpack.base')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const isDev = process.env.NODE_ENV === 'development'
 
-const config = {
+const config = webpackMerge(baseConfig, {
   mode: 'development',
   entry: {
     app: path.join(__dirname, '../client/app.js')
   },
   output: {
-    filename: '[name].[hash].js',
-    path: path.join(__dirname,'../dist'),
-    publicPath: '/public/'
-  },
-  module: {
-    rules: [
-      {
-        enforce:'pre',
-        test:/.(js|jsx)$/,
-        loader:'eslint-loader',
-        exclude: [
-          path.resolve(__dirname, '../node_modules')
-        ]
-      },
-      {
-        test: /.jsx$/,
-        loader: 'babel-loader',
-      },
-      {
-        test: /.(js)$/, 
-        loader: 'babel-loader',
-        exclude: [
-          path.join(__dirname, '../node_modules')
-        ]
-      }
-    ]
+    filename: '[name].[hash].js'
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, '../client/template.html')
+      template: path.join(__dirname, '../client/template.html') // html内容不变，插入我们生成的js
+    }),
+    new HtmlWebpackPlugin({
+      template: '!!ejs-compiled-loader!' + path.join(__dirname, '../client/server.template.ejs'),
+      filename: 'server.ejs'
     })
   ]
-}
+})
 
-if(isDev){
+if (isDev) {
+  config.devtool = '#@cheap-module-eval-source-map' // 形成source-map在客户端打开网页调试代码（源代码）
   config.entry = {
     app: [
+      /*
+      react-hot-loader/patch： 页面的局部刷新，只刷新了修改了的代码，要放在entry的最前面，如果有babel-polyfill就放在babel-polyfill的后面
+      babel-polyfill: Babel默认只转换新的JavaScript句法（syntax），而不转换新的API，
+          比如Iterator、Generator、Set、Maps、Proxy、Reflect、Symbol、Promise等全局对象，
+          以及一些定义在全局对象上的方法（比如Object.assign）都不会转码。
+          举例来说，ES6在Array对象上新增了Array.from方法。Babel就不会转码这个方法。如果想让这个方法运行，必须使用babel-polyfill，为当前环境提供一个垫片。
+      */
       'react-hot-loader/patch',
       path.join(__dirname, '../client/app.js')
     ]
@@ -54,14 +43,17 @@ if(isDev){
   config.devServer = {
     host: '0.0.0.0',
     port: '8888',
-    contentBase: path.join(__dirname, '../dist'),
+    // contentBase: path.join(__dirname, '../dist'), // 不是output生成的内容的访问路径
     hot: true,
     overlay: {
-      errors: true
+      errors: true // 页面上显示错误信息，只显示错误信息
     },
     publicPath: '/public',
-    historyApiFallback: {
+    historyApiFallback: { // 指定index文件，配置了对应关系，无法访问的路径都返回它配置的东西
       index: '/public/index.html'
+    },
+    proxy: { // 配置代理，请求cnode时，域名中有api的统一代理到localhost：3333
+      '/api': 'http://localhost:3333'
     }
   }
   config.plugins.push(new webpack.HotModuleReplacementPlugin())

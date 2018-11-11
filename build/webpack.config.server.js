@@ -1,36 +1,16 @@
 const path = require('path')
-module.exports = {
+const webpackMerge = require('webpack-merge')
+const baseConfig = require('./webpack.base')
+module.exports = webpackMerge(baseConfig, {
   target: 'node',
+  mode: 'production',
   entry: {
     app: path.join(__dirname, '../client/server-entry.js')
   },
+  // 防止将某些 import 的包(package)打包到 bundle 中，而是在运行时(runtime)再去从外部获取这些扩展依赖(external dependencies)。
+  externals: Object.keys(require('../package.json').dependencies),
   output: {
     filename: 'server-entry.js',
-    path: path.join(__dirname,'../dist'),
-    publicPath: '/public',
     libraryTarget: 'commonjs2'
-  },
-  module: {
-    rules: [
-      {
-        enforce:'pre',
-        test:/.(js|jsx)$/,
-        loader:'eslint-loader',
-        exclude: [
-          path.resolve(__dirname, '../node_modules')
-        ]
-      },
-      {
-        test: /.jsx$/,
-        loader: 'babel-loader',
-      },
-      {
-        test: /.(js)$/, 
-        loader: 'babel-loader',
-        exclude: [
-          path.join(__dirname, '../node_modules')
-        ]
-      }
-    ]
   }
-}
+})

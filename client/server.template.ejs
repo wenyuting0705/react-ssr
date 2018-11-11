@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%%- meta %>
+  <%%- title %>
+  <%%- link %>
+  <%%- style %>
+  <style id="jss-server-side">
+  <%%- materialCss %>
+  </style>
+</head>
+<body>
+  <div id="root"><%%- appString %></div>
+  <script>
+    /* 定义了store的初始值，页面初始显示的状态，从server-render.js文件中获取 */
+    window.__INITIAL__STATE__ = <%%- initialState %>
+  </script>
+</body>
+</html>
