@@ -1,20 +1,27 @@
 import React, { Component } from 'react'
-// import {
-//   observer,
-//   inject,
-// } from 'mobx-react'
-// import PropTypes from 'prop-types'
+import {
+  observer,
+  inject,
+} from 'mobx-react'
+import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab';
+import List from '@material-ui/core/List'
+import CircularProgress from '@material-ui/core/CircularProgress'
 // import { Button } from '@material-ui/core'
 // import { withStyles } from '@material-ui/core/styles';
-// import AppState from '../../store/app-state'
+import { AppState } from '../../store/app-state'
 import Container from '../layout/container'
 import TopicListItem from './list-item'
 
-// @inject('appState') @observer
+@inject(stores => {
+  return {
+    appState: stores.appState,
+    topicStore: stores.topicStore,
+  }
+}) @observer
 
 class TopicList extends Component {
   constructor() {
@@ -28,6 +35,7 @@ class TopicList extends Component {
 
   componentDidMount() {
     // do somethine here
+    this.props.topicStore.fetchTopics()
   }
 
   changeTab = (e, index) => {
@@ -41,16 +49,18 @@ class TopicList extends Component {
   }
 
   render() {
-    // const { appState } = this.props
+    const { topicStore } = this.props
+    const topicList = topicStore.topics
+    const syncingTopics = topicStore.syncing
     const { tabIndex } = this.state
-    const topic = {
-      tab: 'share',
-      title: 'this is title',
-      username: 'wenyt',
-      reply_count: '20',
-      visit_count: '30',
-      create_time: 'aaaaaaa',
-    }
+    // const topic = {
+    //   tab: 'share',
+    //   title: 'this is title',
+    //   username: 'wenyt',
+    //   reply_count: '20',
+    //   visit_count: '30',
+    //   create_time: 'aaaaaaa',
+    // }
     return (
       <Container>
         <Helmet>
@@ -65,7 +75,19 @@ class TopicList extends Component {
           <Tab label="精品" />
           <Tab label="测试" />
         </Tabs>
-        <TopicListItem onClick={this.listItemClick} topic={topic} />
+        <List>
+          {
+            topicList.map((topic, index) => <TopicListItem onClick={this.listItemClick} topic={topic} key={index} />)
+          }
+        </List>
+        {
+          syncingTopics
+            ? (
+              <div>
+                <CircularProgress color="accent" size={100} />
+              </div>
+            ) : null
+        }
       </Container>
     )
   }
@@ -73,6 +95,8 @@ class TopicList extends Component {
 
 export default TopicList
 
-// TopicList.propTypes = {
-//   // appState: PropTypes.instanceOf(AppState).isRequired,
-// }
+// 验证mobx的注入的时候都是使用wrappedComponent
+TopicList.wrappedComponent.propTypes = {
+  appState: PropTypes.instanceOf(AppState).isRequired,
+  topicStore: PropTypes.object.isRequired,
+}

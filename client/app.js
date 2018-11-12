@@ -10,7 +10,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import { lightBlue, pink } from '@material-ui/core/colors'
 
 import App from './views/App'
-import AppState from './store/app-state'
+import { AppState, TopicStore } from './store/store'
 
 // 创建主题，指定主题颜色
 const theme = createMuiTheme({
@@ -45,6 +45,9 @@ const createApp = (TheApp) => {
   return Main
 }
 
+const appState = new AppState(initialState.appState)
+const topicStore = new TopicStore(initialState.topicStore)
+
 const root = document.getElementById('root')
 
 // react 16中要求如果做服务端渲染的话，使用hydrate进行渲染
@@ -52,7 +55,7 @@ const render = (Component) => {
   /*eslint-disable*/
   ReactDOM.hydrate(
     <AppContainer>
-      <Provider appState={new AppState(initialState.appState)}>
+      <Provider appState={appState} topicStore={topicStore}>
         <BrowserRouter>
           <MuiThemeProvider theme={theme}>
             <Component />
@@ -80,3 +83,5 @@ react 16服务端渲染功能
 渲染数据的代码，最后是结构等，以流的方式发送给客户端。
 这种方式需要按照顺序的方式去渲染，否则无法使用
 */
+// "lint": "eslint --ext .js --ext .jsx client/",
+    // "precommit": "npm run lint",
