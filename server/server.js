@@ -1,11 +1,28 @@
 /*
-webpack.server.js引用了libraryTarget库，采用了commonJS2的方式，默认采用export default的方式
+webpack.server.js引用了libraryTarget库，采用了commonJS2的方式，commonJS2默认采用export default的方式
 node中默认使用require的方式，它不会读default的内容，而是拿到的整个export出来的东西，使用的时候要在require插件的后面加个.default
 */
 
 const express = require('express')
+/** 
+ * serve-favicon：
+ * 请求网页logo，执行favicon.ico文件
+*/
 const favicon = require('serve-favicon')
+/**
+ * body-parser
+ * 对post请求的请求体进行解析
+ * 实现要点：
+ * 1.处理不同类型的请求体：比如text、json、urlencoded等，对应的报文主体的格式不同。
+ * 2.处理不同的编码：比如utf8、gbk等。
+ * 3.处理不同的压缩类型：比如gzip、deflare等。
+ * 4.其他边界、异常的处理。
+ *  */ 
 const bodyParser = require('body-parser')
+/**
+ * express-session:
+ * 用指定的参数创建一个session中间件，sesison数据不是保存在cookie中，仅仅sessionID保存到cookie中，session的数据仅仅保存在服务器端
+ *  */
 const session = require('express-session')
 const serverRender = require('./util/server-render')
 const fs = require('fs') // 将生成的HTML文件读入
@@ -15,9 +32,18 @@ const isDev = process.env.NODE_ENV === 'development'
 
 const app = express()
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())  // 解析 application/json
+app.use(bodyParser.urlencoded({ extended: false }))  // 解析 application/x-www-form-urlencoded
 
+/**
+ * name:在response中sessionID这个cookie的名称。也可以通过这个name读取，默认是connect.sid。
+ *      如果一台机器上有多个app运行在同样的hostname+port, 那么你需要对这个sessin的cookie进行切割，所以最好的方法还是通过name设置不同的值
+ * resave:强制session保存到session store中。
+ * saveUninitialized:强制没有“初始化”的session保存到storage中，没有初始化的session指的是：刚被创建没有被修改,如果是要实现登陆的session那么最好设置为false,
+ *                    设置为false还有一个好处，当客户端没有session的情况下并行发送多个请求时。默认是true,但是不建议使用默认值。
+ * secret:用于对sessionID的cookie进行签名，可以是一个string(一个secret)或者数组(多个secret)。
+ *        如果指定了一个数组那么只会用 第一个元素对sessionID的cookie进行签名，其他的用于验证请求中的签名。
+ */
 app.use(session({
   maxAge: 10 * 60 * 1000,
   name: 'tid',
