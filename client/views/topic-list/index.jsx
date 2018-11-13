@@ -12,11 +12,11 @@ import List from '@material-ui/core/List'
 import CircularProgress from '@material-ui/core/CircularProgress'
 // import { Button } from '@material-ui/core'
 // import { withStyles } from '@material-ui/core/styles';
-import { AppState } from '../../store/app-state'
+// import AppState from '../../store/app-state'
 import Container from '../layout/container'
 import TopicListItem from './list-item'
 
-@inject(stores => {
+@inject((stores) => {
   return {
     appState: stores.appState,
     topicStore: stores.topicStore,
@@ -35,7 +35,8 @@ class TopicList extends Component {
 
   componentDidMount() {
     // do somethine here
-    this.props.topicStore.fetchTopics()
+    const { topicStore } = this.props
+    topicStore.fetchTopics()
   }
 
   changeTab = (e, index) => {
@@ -77,14 +78,20 @@ class TopicList extends Component {
         </Tabs>
         <List>
           {
-            topicList.map((topic, index) => <TopicListItem onClick={this.listItemClick} topic={topic} key={index} />)
+            topicList.map(topic => (
+              <TopicListItem
+                onClick={this.listItemClick}
+                topic={topic}
+                key={topic.id}
+              />
+            ))
           }
         </List>
         {
           syncingTopics
             ? (
               <div>
-                <CircularProgress color="accent" size={100} />
+                <CircularProgress color="secondary" size={100} />
               </div>
             ) : null
         }
@@ -97,6 +104,6 @@ export default TopicList
 
 // 验证mobx的注入的时候都是使用wrappedComponent
 TopicList.wrappedComponent.propTypes = {
-  appState: PropTypes.instanceOf(AppState).isRequired,
+  // appState: PropTypes.instanceOf(AppState).isRequired,
   topicStore: PropTypes.object.isRequired,
 }

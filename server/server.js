@@ -4,7 +4,7 @@ node中默认使用require的方式，它不会读default的内容，而是拿�
 */
 
 const express = require('express')
-/** 
+/**
  * serve-favicon：
  * 请求网页logo，执行favicon.ico文件
 */
@@ -17,7 +17,7 @@ const favicon = require('serve-favicon')
  * 2.处理不同的编码：比如utf8、gbk等。
  * 3.处理不同的压缩类型：比如gzip、deflare等。
  * 4.其他边界、异常的处理。
- *  */ 
+ *  */
 const bodyParser = require('body-parser')
 /**
  * express-session:
@@ -32,8 +32,8 @@ const isDev = process.env.NODE_ENV === 'development'
 
 const app = express()
 
-app.use(bodyParser.json())  // 解析 application/json
-app.use(bodyParser.urlencoded({ extended: false }))  // 解析 application/x-www-form-urlencoded
+app.use(bodyParser.json()) // 解析 application/json
+app.use(bodyParser.urlencoded({ extended: false })) // 解析 application/x-www-form-urlencoded
 
 /**
  * name:在response中sessionID这个cookie的名称。也可以通过这个name读取，默认是connect.sid。

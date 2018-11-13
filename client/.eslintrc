@@ -20,6 +20,7 @@
     "arrow-body-style": [0],
     "no-param-reassign": [0],
     "react/forbid-prop-types": [0],
-    "react/jsx-one-expression-per-line": [0]
+    "react/jsx-one-expression-per-line": [0],
+    "max-len": [0]
   }
 }
