@@ -14,13 +14,13 @@
     "semi":[0],
     "react/jsx-filename-extension":[0],
     "linebreak-style": [0],
-    "experimentalDecorators": [0],
     "jsx-a11y/anchor-is-valid": [0],
     "react/require-default-props": [0],
     "arrow-body-style": [0],
     "no-param-reassign": [0],
     "react/forbid-prop-types": [0],
     "react/jsx-one-expression-per-line": [0],
-    "max-len": [0]
+    "max-len": [0],
+    "no-console": [0]
   }
 }

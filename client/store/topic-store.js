@@ -46,12 +46,13 @@ class TopicStores {
     this.topics.push(new Topics(createTopic(topic)))
   }
 
-  @action fetchTopics() {
+  @action fetchTopics(tab) {
     return new Promise((resolve, reject) => {
       this.syncing = true
       this.topics = []
       get('./topics', {
         mdrender: false,
+        tab,
         // 告诉我们CPU和CPI是否要把它的markdown字符串渲染成HTML字符串，cnode写文章用的是markdown格式，
         // markdown 要经过转义才能在网页上呈现，如果返回的是markdown，要转义成我们要呈现的内容，如果是HTML，可以直接进行展现
         // 默认返回false，使用markdown，因为需要编辑，如果没有markdown源码，没法编辑
