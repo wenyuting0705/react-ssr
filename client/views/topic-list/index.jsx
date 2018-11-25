@@ -14,7 +14,7 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 // import { Button } from '@material-ui/core'
 // import { withStyles } from '@material-ui/core/styles';
 // import AppState from '../../store/app-state'
-import Container from '../layout/container'
+import Container from '../components/container'
 import TopicListItem from './list-item'
 import { tabs } from '../../util/variable-define'
 
@@ -50,8 +50,9 @@ class TopicList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.location.search !== this.props.location.search) {
-      this.props.topicStore.fetchTopics(this.getTab(nextProps.location.search))
+    const { location, topicStore } = this.props
+    if (nextProps.location.search !== location.search) {
+      topicStore.fetchTopics(this.getTab(nextProps.location.search))
     }
   }
 
@@ -71,8 +72,9 @@ class TopicList extends Component {
     })
   }
 
-  listItemClick = () => {
-    // do somethine here
+  listItemClick = (topic) => {
+    const { router } = this.context
+    router.history.push(`/detail/${topic.id}`)
   }
 
   render() {
@@ -98,7 +100,7 @@ class TopicList extends Component {
           {
             topicList.map(topic => (
               <TopicListItem
-                onClick={this.listItemClick}
+                onClick={() => this.listItemClick(topic)}
                 topic={topic}
                 key={topic.id}
               />
@@ -118,8 +120,6 @@ class TopicList extends Component {
   }
 }
 
-export default TopicList
-
 // 验证mobx的注入的时候都是使用wrappedComponent
 TopicList.wrappedComponent.propTypes = {
   // appState: PropTypes.instanceOf(AppState).isRequired,
@@ -129,3 +129,5 @@ TopicList.wrappedComponent.propTypes = {
 TopicList.propTypes = {
   location: PropTypes.object.isRequired,
 }
+
+export default TopicList

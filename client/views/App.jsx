@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Routes from '../config/router'
-import AppBar from './layout/app-bar'
+import AppBar from './components/app-bar'
 
 export default class App extends Component {
   componentDidMount() {
