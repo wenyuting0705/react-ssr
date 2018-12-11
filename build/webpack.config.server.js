@@ -17,7 +17,7 @@ module.exports = webpackMerge(baseConfig, {
   plugins: [
     new webpack.DefinePlugin({
       // 定义变量，在打包之后的代码里可以获取这个变量
-      'process.env.API_BASE': '"http://127.0.0.1:3000"'
+      'process.env.API_BASE': '"http://127.0.0.1:3333"'
     })
   ]
 })

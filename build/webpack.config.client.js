@@ -3,6 +3,8 @@ const webpack = require('webpack')
 const webpackMerge = require('webpack-merge')
 const baseConfig = require('./webpack.base')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const NameAllModulesPlugin = require('name-all-modules-plugin')
+const cdnConfig = require('../app.config').cdn
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -57,6 +59,48 @@ if (isDev) {
     }
   }
   config.plugins.push(new webpack.HotModuleReplacementPlugin())
+} else {
+  config.entry = {
+    app: path.join(__dirname, '../client/app.js'),
+    vendor: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'mobx',
+      'mobx-react',
+      'axios',
+      'query-string',
+      'dateformat',
+      'marked'
+    ]
+  }
+  config.output.filename = '[name].[chunkhash].js' // 有多个文件对时候，会为每个文件生成自己对hash
+  config.output.publicPath = cdnConfig.host
+  config.plugins.push(
+    new webpack.optimize.UglifyJsPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor'
+    }),
+    // 打包的代码每次都会不一样，声明，不一样的打包到这里
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest',
+      minChunks: Infinity
+    }),
+    new webpack.NamedModulesPlugin(), // 使用webpack异步的包编码时是使用的0，1，2，3，4去编码的，改了业务代码后顺序会出现变化，使用了之后会给重新命名，这样有模块变更不会影响其他模块
+    // 解决webpack的一些问题
+    new NameAllModulesPlugin(),
+    new webpack.DefinePlugin({ // 区分打包的bundle还是开发的bundle
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
+      }
+    }),
+    new webpack.NamedChunksPlugin((chunk) => { // 给每个chunk打包的名字的操作
+      if (chunk.name) {
+        return chunk.name
+      }
+      return chunk.mapModules(m => path.relative(m.context, m.request)).join('_')
+    })
+  )
 }
 
 module.exports = config

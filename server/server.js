@@ -83,7 +83,10 @@ app.use(function (error, req, res, next) {
   res.status(500).send(error)
 })
 
-app.listen(3333, function () {
+// 指定host和端口，不指定默认是0.0.0.0，从外网就可以访问到，是不安全的
+const host = process.env_HOST || '0.0.0.0'
+const port = process.env_PORT || 3333
+app.listen(port, host, function () {
   console.log('server is listening on 3333')
 })
 /*

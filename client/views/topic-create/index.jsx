@@ -15,6 +15,9 @@ import Container from '../components/container'
 import createStyles from './styles'
 import { tabs } from '../../util/variable-define'
 
+// react-simplemde-editor
+// 用第三方插件会导致一些问题，package.json里有个选项main，import文件夹的时候实际上import的是哪个文件，打开这个文件
+// 它依赖的是0.14.2 的react版本，我们引入这个插件，打包的时候打包的是它自己的react，我们打包出来的有两个react版本
 import SimpleMDE from '../../components/simple-mde'
 
 @inject((stores) => {

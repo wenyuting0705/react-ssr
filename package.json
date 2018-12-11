@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:client": "webpack --config build/webpack.config.client.js",
-    "build:server": "webpack --config build/webpack.config.server.js",
+    "build:client": "cross-env NODE_ENV=production webpack --config build/webpack.config.client.js",
+    "build:server": "cross-env NODE_ENV=production webpack --config build/webpack.config.server.js",
     "dev:client": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.config.client.js",
     "dev:server": "nodemon server/server.js",
+    "upload": "node build/upload.js",
+    "deploy": "npm run build && npm run upload",
     "clear": "rimraf dist",
     "build": "npm run clear && npm run build:client && npm run build:server",
     "start": "cross-env NODE_ENV=production node server/server.js"
@@ -73,6 +75,7 @@
     "http-proxy-middleware": "^0.19.0",
     "husky": "^1.1.2",
     "memory-fs": "^0.4.1",
+    "name-all-modules-plugin": "^1.0.1",
     "nodemon": "^1.18.5",
     "react-hot-loader": "^4.3.11",
     "rimraf": "^2.6.2",

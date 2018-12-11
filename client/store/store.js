@@ -1,14 +1,14 @@
 import AppState from './app-state'
-import TopicStore from './topic-store'
+import TopicStores from './topic-store'
 
-export { AppState, TopicStore }
+export { AppState, TopicStores }
 
 export default {
   AppState,
-  TopicStore,
+  TopicStores,
 }
 
 export const createStoreMap = () => ({
   appState: new AppState(),
-  topicStore: new TopicStore(),
+  topicStore: new TopicStores(),
 })

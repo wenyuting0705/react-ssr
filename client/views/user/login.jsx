@@ -48,6 +48,9 @@ class UserLogin extends React.Component {
       helpText: '',
     })
     return this.props.appState.login(this.state.accesstoken)
+      .then(() => {
+        this.context.router.history.replace('/user/info')
+      })
       .catch((msg) => {
         this.props.appState.notify({ message: msg })
       })
@@ -84,7 +87,7 @@ class UserLogin extends React.Component {
           />
           <Button
             raised
-            color="accent"
+            color="primary"
             onClick={this.handleLogin}
             className={classes.loginButton}
           >

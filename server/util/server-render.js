@@ -50,6 +50,7 @@ const getStoreState = (stores) => {
 
 module.exports = (bundle, template, req, res) => {
   return new Promise((resolve, reject) => {
+    const { user } = req.session
     const createStoreMap = bundle.createStoreMap // store.js暴露出来的函数，在server-entry中被引入
     const createApp = bundle.default // server-entry暴露出来的函数
     const routerContext = {}
@@ -57,6 +58,11 @@ module.exports = (bundle, template, req, res) => {
     const sheetsRegistry = new SheetsRegistry()
     const jss = create(preset())
     jss.options.createGenerateClassName = createGenerateClassName
+
+    if (user) {
+      stores.appState.user.isLogin = true
+      stores.appState.user.info = user
+    }
     const theme = createMuiTheme({
       palette: {
         primary: colors.lightBlue,

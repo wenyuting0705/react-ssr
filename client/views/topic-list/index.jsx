@@ -14,6 +14,7 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 // import { Button } from '@material-ui/core'
 // import { withStyles } from '@material-ui/core/styles';
 // import AppState from '../../store/app-state'
+import TopicStores from '../../store/topic-store'
 import Container from '../components/container'
 import TopicListItem from './list-item'
 import { tabs } from '../../util/variable-define'
@@ -42,7 +43,7 @@ class TopicList extends Component {
     this.listItemClick = this.listItemClick.bind(this)
   }
 
-  componentDidMount() {
+  componentWillMount() {
     // do somethine here
     const tab = this.getTab()
     const { topicStore } = this.props
@@ -74,13 +75,26 @@ class TopicList extends Component {
 
   listItemClick = (topic) => {
     const { router } = this.context
+    console.log(topic)
     router.history.push(`/detail/${topic.id}`)
+  }
+
+  asyncBootstrap() {
+    const query = queryString.parse(this.props.location.search)
+    const { tab } = query
+    return this.props.topicStore.fetchTopics(tab || 'all').then(() => {
+      return true
+    }).catch(() => {
+      return false
+    })
   }
 
   render() {
     const { topicStore } = this.props
-    const topicList = topicStore.topics
+    console.log('topicStore:', topicStore)
+    const { createTopics, topics } = topicStore
     const syncingTopics = topicStore.syncing
+    const { user } = this.props
     // const { tabIndex } = this.state
     const tab = this.getTab()
     return (
@@ -96,15 +110,37 @@ class TopicList extends Component {
             ))
           }
         </Tabs>
+        {
+          (createTopics && createTopics.length > 0)
+            ? <List>
+              {
+                createTopics.map((topic) => {
+                  topic = Object.assign({}, topic, {
+                    author: user.info,
+                  })
+                  return (
+                    <TopicListItem
+                      onClick={() => this.listItemClick(topic)}
+                      topic={topic}
+                      key={topic.id}
+                    />
+                  )
+                })
+              }
+            </List>
+            : null
+        }
         <List>
           {
-            topicList.map(topic => (
-              <TopicListItem
-                onClick={() => this.listItemClick(topic)}
-                topic={topic}
-                key={topic.id}
-              />
-            ))
+            topics.map((topic) => {
+              return (
+                <TopicListItem
+                  onClick={() => this.listItemClick(topic)}
+                  topic={topic}
+                  key={topic.id}
+                />
+              )
+            })
           }
         </List>
         {
@@ -123,7 +159,8 @@ class TopicList extends Component {
 // 验证mobx的注入的时候都是使用wrappedComponent
 TopicList.wrappedComponent.propTypes = {
   // appState: PropTypes.instanceOf(AppState).isRequired,
-  topicStore: PropTypes.object.isRequired,
+  topicStore: PropTypes.instanceOf(TopicStores).isRequired,
+  user: PropTypes.object.isRequired,
 }
 
 TopicList.propTypes = {

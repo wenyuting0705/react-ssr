@@ -3,7 +3,7 @@ import {
   toJS,
   action,
 } from 'mobx'
-import axios from 'axios'
+import { post, get } from '../util/http'
 
 let notifyId = 0
 
@@ -13,8 +13,8 @@ export default class AppState {
     info: {},
     detail: {
       syncing: false,
-      recent_topics: [],
-      recent_replies: [],
+      recentTopics: [],
+      recentReplies: [],
     },
     collections: {
       syncing: false,
@@ -30,7 +30,7 @@ export default class AppState {
     topicTab: 0,
   }
 
-  init({ user }) {
+  init(user) {
     if (user) {
       this.user = user
     }
@@ -38,16 +38,16 @@ export default class AppState {
 
   @action login(accessToken) {
     return new Promise((resolve, reject) => {
-      axios.post('/api/user/login', {
+      post('/user/login', {}, {
         accessToken,
       }).then((resp) => {
-        if (resp.status === 200 && resp.data.success) {
-          this.user.info = resp.data.data
+        if (resp.status === 200 && resp.success) {
+          this.user.info = resp.data
           this.user.isLogin = true
           resolve()
           this.notify({ message: '登录成功' })
         } else {
-          reject(resp.data.msg)
+          reject(resp.msg)
         }
       }).catch((err) => {
         if (err.response) {
@@ -75,14 +75,14 @@ export default class AppState {
   @action getUserDetail() {
     this.user.detail.syncing = true
     return new Promise((resolve, reject) => {
-      axios.get(`/api/user/${this.user.info.loginName}`)
+      get(`/user/${this.user.info.loginname}`)
         .then((resp) => {
-          if (resp.status === 200 && resp.data.success) {
-            this.user.detail.recent_replies = resp.data.data.recent_replies
-            this.user.detail.recent_topics = resp.data.data.recent_topics
+          if (resp.status === 200 && resp.success) {
+            this.user.detail.recentReplies = resp.data.recent_replies
+            this.user.detail.recentTopics = resp.data.recent_topics
             resolve()
           } else {
-            reject(resp.data.msg)
+            reject(resp.msg)
             this.notify({ message: resp.data.msg })
           }
           this.user.detail.syncing = false
@@ -97,14 +97,14 @@ export default class AppState {
   @action getUserCollection() {
     this.user.collections.syncing = true
     return new Promise((resolve, reject) => {
-      axios.get(`/api/topic_collect/${this.user.info.loginName}`)
+      get(`/topic_collect/${this.user.info.loginName}`)
         .then((resp) => {
-          if (resp.status === 200 && resp.data.success) {
-            this.user.collections.list = resp.data.data
+          if (resp.status === 200 && resp.success) {
+            this.user.collections.list = resp.data
             resolve()
           } else {
-            reject(resp.data.msg)
-            this.notify({ message: resp.data.msg })
+            reject(resp.msg)
+            this.notify({ message: resp.msg })
           }
           this.user.collections.syncing = false
         }).catch((err) => {

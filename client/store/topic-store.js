@@ -6,7 +6,7 @@ import {
   action,
   extendObservable,
 } from 'mobx'
-import { topicSchema } from '../util/variable-define'
+import { topicSchema, replySchema } from '../util/variable-define'
 import {
   get,
   post,
@@ -15,6 +15,10 @@ import {
 // 这样会返回所有字段已定义的topic对象
 const createTopic = (topic) => {
   return Object.assign({}, topicSchema, topic)
+}
+
+const createReply = (reply) => {
+  return Object.assign({}, replySchema, reply)
 }
 
 /*
@@ -34,23 +38,22 @@ class Topics {
 
   @action doReply(content) {
     return new Promise((resolve, reject) => {
-      post(`/topic/${this.id}/replies`, {
+      post(`/topic/${this.id}/replies`, { needAccessToken: true }, {
         content,
       })
-        .then((data) => {
-          debugger // eslint-disable-line
-          if (data.success) {
-            this.createdReplies.push({
+        .then((resp) => {
+          if (resp.success) {
+            this.createdReplies.push(createReply({
               create_at: Date.now(),
-              id: data.reply_id,
+              id: resp.reply_id,
               content,
-            })
+            }))
             resolve({
-              replyId: data.reply_id,
+              replyId: resp.reply_id,
               content,
             })
           } else {
-            reject()
+            reject(resp)
           }
         }).catch(reject)
     })
@@ -93,8 +96,8 @@ class TopicStores {
   }
 
   @computed get detailMap() {
-    return this.details.reduce((result, detail) => {
-      result[detail.id] = detail
+    return this.details.reduce((result, topic) => {
+      result[topic.id] = topic
       return result
     }, {})
   }
@@ -106,6 +109,7 @@ class TopicStores {
 
   @action fetchTopics(tab) {
     return new Promise((resolve, reject) => {
+      // 判断是否已经请求过，请求过就不再请求了
       if (tab === this.tab && this.topics.length > 0) {
         resolve()
       } else {
@@ -134,24 +138,25 @@ class TopicStores {
     })
   }
 
-  @action createTopic(title, tab, content) {
+  @action createTopics(title, tab, content) {
     return new Promise((resolve, reject) => {
       post('/topics', {
         title, tab, content,
       })
-        .then((data) => {
-          if (data.success) {
+        .then((resp) => {
+          if (resp.success) {
             const topic = {
               title,
               tab,
               content,
-              id: data.topic_id,
+              id: resp.topic_id,
               create_at: Date.now(),
             }
             this.createdTopics.push(new Topics(createTopic(topic)))
+            console.log('createdTopics:', this.createdTopics)
             resolve(topic)
           } else {
-            reject(new Error(data.error_msg || '未知错误'))
+            reject(new Error(resp.error_msg || '未知错误'))
           }
         })
         .catch((err) => {
@@ -176,7 +181,9 @@ class TopicStores {
             if (resp.success) {
               const topic = new Topics(createTopic(resp.data))
               this.details.push(topic)
-              return topic
+              resolve(topic)
+            } else {
+              reject()
             }
           })
           .catch(reject)

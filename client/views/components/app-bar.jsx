@@ -40,25 +40,24 @@ class MainAppBar extends React.Component {
     this.loginButtonClick = this.loginButtonClick.bind(this)
   }
 
-  /* eslint-disable */
+
   onHomeIconClick = () => {
     const { router } = this.context
     router.history.push('/index?tab=all')
   }
 
   createButtonClick = () => {
-    console.log('createButtonClick')
+    this.context.router.history.push('/topic/create')
   }
 
   loginButtonClick = () => {
     const { router } = this.context
-    const { location } = this.props
-    console.log(location, location.pathname, '----')
+    const { location, user } = this.props
     if (location.pathname !== '/user/login') {
-      if (this.props.user.isLogin) {
-        this.context.router.history.push('/user/info')
+      if (user.isLogin) {
+        router.history.push('/user/info')
       } else {
-        this.context.router.history.push({
+        router.history.push({
           pathname: '/user/login',
           search: `?from=${location.pathname}`,
         })
@@ -77,14 +76,14 @@ class MainAppBar extends React.Component {
             </IconButton>
             <Typography type="title" color="inherit" className={classes.flex}>TNode</Typography>
             {
-              user.isLogin ?
-              <Button raised="true" onClick={this.createButtonClick}>New</Button> :
-                null
+              user.isLogin
+                ? <Button raised="true" onClick={this.createButtonClick}>New</Button>
+                : null
             }
             <Button onClick={this.loginButtonClick}>
-            {
-              user.isLogin ? user.info.loginname : '登录'
-            }
+              {
+                user.isLogin ? user.info.loginname : '登录'
+              }
             </Button>
           </ToolBar>
         </AppBar>
@@ -93,7 +92,7 @@ class MainAppBar extends React.Component {
   }
 }
 
-MainAppBar.propTypes = {
+MainAppBar.wrappedComponent.propTypes = {
   user: PropTypes.object.isRequired,
 }
 

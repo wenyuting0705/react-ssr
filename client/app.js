@@ -10,7 +10,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import { lightBlue, pink } from '@material-ui/core/colors'
 
 import App from './views/App'
-import { AppState, TopicStore } from './store/store'
+import { AppState, TopicStores } from './store/store'
 
 // 创建主题，指定主题颜色
 const theme = createMuiTheme({
@@ -45,8 +45,9 @@ const createApp = (TheApp) => {
   return Main
 }
 
-const appState = new AppState(initialState.appState)
-const topicStore = new TopicStore(initialState.topicStore)
+const appState = new AppState()
+appState.init(initialState.appState)
+const topicStore = new TopicStores(initialState.topicStore)
 
 const root = document.getElementById('root')
 
@@ -85,3 +86,15 @@ react 16服务端渲染功能
 */
 // "lint": "eslint --ext .js --ext .jsx client/",
     // "precommit": "npm run lint",
+/** 
+ * 部署服务器上的代码需要注意的点
+ * 1.首先要使用一个进程管理工具，pm2，如果nodejs启动之后，仅仅使用我们自己的命令去跑，那么node会有很多服务器部署的概念没办法很好的进行
+ *   比如日志收集，或者服务崩溃了无法访问，如果没有工具帮忙自动重启，要手动重启，而且不能很及时的知道服务崩溃了
+ *   使用工具可以帮我们收集日志，管理进程，崩溃了可以自动重启，可以根据服务器的配置启动多个实例
+ * 2.安装全局pm2,配置脚本
+ *   pm2启动服务：pm2 start process.yml
+ *   日志：pm2 logs
+ * 3.部署到外网服务器，通过ssh连接，连接之前生成key，
+ * 4.连接到服务器之后安装nginx
+ * 5.部署之前先提交代码，保证部署的是完整的代码
+*/

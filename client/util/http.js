@@ -11,6 +11,7 @@ const baseUrl = process.env.API_BASE || ''
 
 let result
 const parseUrl = (url, params) => {
+  params = params || {}
   const str = Object.keys(params).reduce((reduce, key) => {
     result += `${key}=${params[key]}&`
     return result // 返回的是？后面拼接的参数

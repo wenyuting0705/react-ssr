@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import marked from 'marked'
+import marked from 'marked' // 把markdown的内容转化成html能显示的内容
 import Helmet from 'react-helmet'
 import {
   inject,
@@ -131,7 +131,7 @@ class TopicDetail extends React.Component {
             <h3>{topic.title}</h3>
           </header>
           <section className={classes.body}>
-            {/* 不转义html标签，而是直接放在p标签下面 */}
+            {/* 不转义html标签，而是直接放在p标签下面，直接使用会把标签信息也显示到页面 */}
             <p dangerouslySetInnerHTML={{ __html: marked(topic.content) }} />
           </section>
         </Container>
@@ -143,6 +143,7 @@ class TopicDetail extends React.Component {
                 <header className={classes.replyHeader}>
                   <span>{' '}</span>
                   <span>{'我的最新回复'}</span>
+                  <span>{`${createdReplies.length}条`}</span>
                 </header>
                 {
                   createdReplies.map((reply) => {
@@ -151,7 +152,7 @@ class TopicDetail extends React.Component {
                         reply={Object.assign({}, reply, {
                           author: {
                             avatar_url: user.info.avatar_url,
-                            loginname: user.info.loginName,
+                            loginname: user.info.loginname,
                           },
                         })}
                         key={reply.id}
